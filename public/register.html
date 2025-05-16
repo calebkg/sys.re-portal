@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <style>
+    :root {
+      --dark-brown: #3b2903;
+      --forest-green: #186409;
+      --light-cream: #f9f7f3;
+      --medium-beige: #e8e1d5;
+      --error-red: #d9534f;
+    }
+
+    body {
+      background-color: var(--light-cream);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .register-container {
+      width: 100%;
+      max-width: 420px;
+      padding: 0 20px;
+    }
+
+    .card {
+      background-color: white;
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(59, 41, 3, 0.15);
+      overflow: hidden;
+    }
+
+    .card-header {
+      background-color: var(--dark-brown);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 25px;
+    }
+
+    .form-label {
+      color: var(--dark-brown);
+      font-weight: 500;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .form-control {
+      background-color: var(--light-cream);
+      border: 1px solid var(--medium-beige);
+      border-radius: 6px;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--forest-green);
+      box-shadow: 0 0 0 3px rgba(24, 100, 9, 0.2);
+      outline: none;
+    }
+
+    .btn-register {
+      background-color: var(--forest-green);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 12px;
+      width: 100%;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-register:hover {
+      background-color: #134a07;
+    }
+
+    .login-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: var(--forest-green);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .login-link:hover {
+      text-decoration: underline;
+    }
+
+    .text-error {
+      color: var(--error-red);
+      text-align: center;
+      margin-top: 15px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        border-radius: 0;
+        box-shadow: none;
+      }
+      
+      .register-container {
+        padding: 0;
+      }
+      
+      body {
+        background-color: white;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <div class="card">
+      <div class="card-header">
+        Create Account
+      </div>
+      <div class="card-body">
+        <form id="registerForm" onsubmit="handleRegister(event)">
+          <label for="regUsername" class="form-label">Username</label>
+          <input type="text" class="form-control" id="regUsername" placeholder="Enter username" required>
+          
+          <label for="regPassword" class="form-label">Password</label>
+          <input type="password" class="form-control" id="regPassword" placeholder="Enter password" required>
+          
+          <label for="regRole" class="form-label">Role</label>
+          <select class="form-control" id="regRole" required>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+          
+          <button type="submit" class="btn-register">Register</button>
+        </form>
+        
+        <a href="login.html" class="login-link">Already have an account? Login</a>
+        <div id="registerError" class="text-error"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const apiService = {
+      createUser: async (username, password, role) => {
+        const response = await fetch('http://localhost:5000/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, role })
+        });
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Registration failed');
+        }
+        return response.json();
+      }
+    };
+
+    async function handleRegister(event) {
+      event.preventDefault();
+      const errorElement = document.getElementById("registerError");
+      errorElement.style.display = "none";
+
+      const username = document.getElementById("regUsername").value;
+      const password = document.getElementById("regPassword").value;
+      const role = document.getElementById("regRole").value;
+
+      try {
+        const response = await apiService.createUser(username, password, role);
+        alert('Registration successful! Please login.');
+        window.location.href = "login.html";
+      } catch (error) {
+        errorElement.textContent = error.message;
+        errorElement.style.display = "block";
+      }
+    }
+  </script>
+</body>
+</html> 
